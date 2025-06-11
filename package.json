@@ -1,17 +1,18 @@
 {
-  "dependencies": {
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "nodemailer": "^7.0.3"
-  },
+  "name": "mi-invitacion",
+  "version": "1.0.0",
+  "description": "Proyecto de invitación para enviar mails",
+  "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js"
   },
-  "name": "mi-invitacion",
-  "version": "1.0.0",
-  "main": "server.js",
-  "keywords": [],
   "author": "",
-  "license": "ISC",
-  "description": ""
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "nodemailer": "^7.0.3"
+  }
 }

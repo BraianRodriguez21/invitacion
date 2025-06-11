@@ -2,35 +2,41 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Invitación</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>¿Te puedo invitar a salir?</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h1>¿TE PUEDO INVITAR A SALIR?</h1>
-  <button onclick="responder('Sí, me encantaría')">Sí</button>
-  <button onclick="responder('No, gracias')">No</button>
+  <div class="card">
+    <h1>¿Te puedo invitar a salir?</h1>
+    <div class="buttons">
+      <button onclick="responder('Sí')">Sí 💖</button>
+      <button onclick="responder('No')">No 😢</button>
+    </div>
+    <p id="mensaje"></p>
+  </div>
 
   <script>
-    async function responder(respuesta) {
+    async function responder(opcion) {
       try {
-        const res = await fetch('/enviar-respuesta', {
+        const response = await fetch('/enviar-respuesta', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ respuesta }),
+          body: JSON.stringify({ respuesta: opcion })
         });
 
-        if (!res.ok) {
-          const texto = await res.text();
-          alert('Error: ' + texto);
-          return;
+        const mensaje = document.getElementById('mensaje');
+        if (response.ok) {
+          mensaje.innerText = '¡Respuesta enviada!';
+        } else {
+          mensaje.innerText = 'Error al enviar 😢';
         }
-
-        const texto = await res.text();
-        alert(texto);
       } catch (error) {
-        alert('Error de conexión: ' + error.message);
+        console.error(error);
+        document.getElementById('mensaje').innerText = 'Error de conexión';
       }
     }
   </script>
 </body>
 </html>
+

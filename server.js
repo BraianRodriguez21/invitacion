@@ -1,46 +1,51 @@
-const express = require('express');
-const nodemailer = require('nodemailer');
-const dotenv = require('dotenv');
-const path = require('path');
+import express from 'express';
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
-
 const app = express();
+const PORT = process.env.PORT || 3000;
 
+app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
+// Ruta para enviar el correo
 app.post('/enviar-respuesta', async (req, res) => {
   const { respuesta } = req.body;
 
-  if (!process.env.EMAIL_DESTINO) {
-    return res.status(500).send('ERROR: No está definida la variable EMAIL_DESTINO');
+  const { EMAIL_USER, EMAIL_PASS, EMAIL_DESTINO } = process.env;
+
+  if (!EMAIL_USER || !EMAIL_PASS || !EMAIL_DESTINO) {
+    return res.status(500).send('ERROR: Faltan variables en .env');
   }
 
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: EMAIL_USER,
+      pass: EMAIL_PASS
+    }
+  });
+
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
+    await transporter.sendMail({
+      from: EMAIL_USER,
+      to: EMAIL_DESTINO,
+      subject: '💌 Invitación respondida',
+      text: `La persona respondió: ${respuesta}`
     });
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_DESTINO,
-      subject: 'Respuesta a tu invitación 💌',
-      text: `La persona respondió: ${respuesta}`,
-    };
-
-    let info = await transporter.sendMail(mailOptions);
-    console.log('Correo enviado:', info.response);
-    res.send('Correo enviado con éxito');
+    res.status(200).send('Correo enviado');
   } catch (error) {
     console.error('Error al enviar correo:', error);
-    res.status(500).send('Error al enviar correo: ' + error.message);
+    res.status(500).send('Error al enviar el correo');
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor corriendo en http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+});
