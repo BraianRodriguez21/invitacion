@@ -1,51 +1,46 @@
-const express = require("express");
-const nodemailer = require("nodemailer");
-const dotenv = require("dotenv");
-const path = require("path");
+const express = require('express');
+const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
+const path = require('path');
 
 dotenv.config();
 
 const app = express();
 
-// Middleware para leer JSON en el body
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Servir archivos estáticos desde la carpeta "public"
-app.use(express.static(path.join(__dirname, "public")));
-
-app.post("/enviar-respuesta", (req, res) => {
+app.post('/enviar-respuesta', async (req, res) => {
   const { respuesta } = req.body;
 
-  console.log("Respuesta recibida:", respuesta);
+  if (!process.env.EMAIL_DESTINO) {
+    return res.status(500).send('ERROR: No está definida la variable EMAIL_DESTINO');
+  }
 
-  // Configuramos el transporte de Nodemailer con Gmail
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: process.env.EMAIL_DESTINO,
-    subject: "Respuesta a tu invitación 💌",
-    text: `La persona respondió: ${respuesta}`,
-  };
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: process.env.EMAIL_DESTINO,
+      subject: 'Respuesta a tu invitación 💌',
+      text: `La persona respondió: ${respuesta}`,
+    };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error("Error al enviar el correo:", error);
-      return res.status(500).send("Error al enviar el correo: " + error.message);
-    }
-    console.log("Correo enviado:", info.response);
-    res.send("Correo enviado con éxito");
-  });
+    let info = await transporter.sendMail(mailOptions);
+    console.log('Correo enviado:', info.response);
+    res.send('Correo enviado con éxito');
+  } catch (error) {
+    console.error('Error al enviar correo:', error);
+    res.status(500).send('Error al enviar correo: ' + error.message);
+  }
 });
 
-// Puerto para el servidor
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor escuchando en http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`Servidor corriendo en http://localhost:${PORT}`));

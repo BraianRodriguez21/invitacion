@@ -7,10 +7,9 @@
   "scripts": {
     "start": "node server.js"
   },
-  "name": "nueva-carpeta-(2)",
+  "name": "mi-invitacion",
   "version": "1.0.0",
   "main": "server.js",
-  "devDependencies": {},
   "keywords": [],
   "author": "",
   "license": "ISC",
