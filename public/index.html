@@ -1,53 +1,36 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>¿Te puedo invitar a salir?</title>
+  <meta charset="UTF-8">
+  <title>¿Salimos?</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f5f5f5;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      padding: 20px;
-    }
-    h2 {
-      font-size: 2rem;
-      margin-bottom: 30px;
-      font-weight: 500;
-    }
+    body { font-family: sans-serif; text-align: center; padding-top: 100px; }
+    h1 { font-size: 2.5rem; color: #ff3366; }
     button {
-      padding: 12px 24px;
-      font-size: 1rem;
-      margin: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background-color: white;
-      color: #333;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      font-size: 1.2rem; padding: 1em 2em; margin: 1em;
+      border: none; border-radius: 10px; cursor: pointer;
     }
-    button:hover {
-      background-color: #333;
-      color: white;
-      border-color: #333;
-    }
-    button:focus {
-      outline: none;
-      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
-    }
+    .si { background-color: #ff4d6d; color: white; }
+    .no { background-color: #ddd; }
   </style>
 </head>
 <body>
-  <h2>¿Te puedo invitar a salir?</h2>
-  <button onclick="enviarRespuesta('Sí')">Sí</button>
-  <button onclick="enviarRespuesta('No')">No</button>
-  <script src="script.js"></script>
+  <h1>¿TE PUEDO INVITAR A SALIR?</h1>
+  <button class="si" onclick="responder('Sí ❤️')">Sí ❤️</button>
+  <button class="no" onclick="responder('No 😢')">No 😢</button>
+
+  <script>
+    function responder(opcion) {
+      fetch("/enviar-respuesta", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ respuesta: opcion })
+      })
+      .then(res => {
+        if (res.ok) alert("¡Gracias por responder!");
+        else alert("Hubo un error 😔");
+      });
+    }
+  </script>
 </body>
 </html>
